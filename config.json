@@ -25,9 +25,9 @@
 
   /**
    * Whether the console should log debug messages.
-   * Default: false
+   * Default: true
    */
-  "show_logs": false,
+  "show_logs": true,
 
   /**
    * The max distance a player can hear from.

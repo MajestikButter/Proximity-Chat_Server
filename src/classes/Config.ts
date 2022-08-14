@@ -15,7 +15,7 @@ const DEF_CONFIG_DATA: ConfigData = {
   server_password: "",
   server_address: "localhost",
   server_port: 8080,
-  show_logs: false,
+  show_logs: true,
   max_distance: 25,
   spectator_to_player: false
 };
