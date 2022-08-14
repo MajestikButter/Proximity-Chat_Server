@@ -3,19 +3,19 @@
    * The name of the server.
    * Default: "MCBE Proximity Chat Server"
    */
-  "server_name": "Test Server",
+  "server_name": "MCBE Proximity Chat Server",
 
   /**
    * The password required to join the proximity server through the web client.
    * Default: ""
    */
-  "server_password": "test",
+  "server_password": "",
 
   /**
    * The address the server will listen on.
    * Default: localhost
    */
-   "server_address": "192.168.1.91",
+   "server_address": "",
 
   /**
    * The port the server will listen on.
@@ -27,7 +27,7 @@
    * Whether the console should log debug messages.
    * Default: false
    */
-  "show_logs": true,
+  "show_logs": false,
 
   /**
    * The max distance a player can hear from.
@@ -39,5 +39,5 @@
    * Enables non-spectator mode players hearing players in spectator mode.
    * Default: false
    */
-   "spectator_to_player": true
+   "spectator_to_player": false
 }
