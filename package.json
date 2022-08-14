@@ -5,7 +5,8 @@
   },
   "scripts": {
     "run": "node --enable-source-maps dist/index.js",
-    "start": "npm i && node build-to-run.js && node --enable-source-maps dist/index.js"
+    "start": "npm run run",
+    "build": "node build-to-run.js"
   },
   "dependencies": {
     "websocket-stream": "^5.5.2",
