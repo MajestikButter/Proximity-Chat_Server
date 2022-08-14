@@ -1,0 +1,14 @@
+{
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/ws": "^8.5.3",
+    "esbuild": "^0.14.48"
+  },
+  "scripts": {
+    "run": "node --enable-source-maps dist/index.js"
+  },
+  "dependencies": {
+    "websocket-stream": "^5.5.2",
+    "ws": "^8.8.0"
+  }
+}

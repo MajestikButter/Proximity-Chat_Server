@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2020",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "dist/server",
+    "strict": true,
+    "noImplicitReturns": true,
+    "allowJs": true,
+    "lib": [
+      "DOM",
+      "ES2022"
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"],
+}
