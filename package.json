@@ -5,7 +5,8 @@
     "esbuild": "^0.14.48"
   },
   "scripts": {
-    "run": "node --enable-source-maps dist/index.js"
+    "run": "node --enable-source-maps dist/index.js",
+    "start": "node build-to-run.js && node --enable-source-maps dist/index.js"
   },
   "dependencies": {
     "websocket-stream": "^5.5.2",
