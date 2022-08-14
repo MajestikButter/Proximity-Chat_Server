@@ -32,7 +32,7 @@ export class Server {
       host,
       port,
     });
-    this.logger.log(`WebSocket started on port ${port}`);
+    this.logger.log(`WebSocket started on ${host}:${port}`);
 
     wss.on("connection", (ws) => {
       this.logger.log("New connection");
