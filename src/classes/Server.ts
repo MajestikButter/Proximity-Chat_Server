@@ -27,7 +27,7 @@ export class Server {
 
   createWebSocketServer() {
     const host = this.config.get("server_address");
-    const port = this.config.get("server_port");
+    const port = process.env.PORT ? parseInt(process.env.PORT) : this.config.get("server_port");
     const wss = new WebSocketServer({
       host,
       port,
@@ -76,11 +76,7 @@ export class Server {
     return wss;
   }
 
-  sendAll(
-    type: string,
-    data: any,
-    filter: (ws: WebSocket, client: Client) => boolean = () => true
-  ) {
+  sendAll(type: string, data: any, filter: (ws: WebSocket, client: Client) => boolean = () => true) {
     for (let [ws, client] of this.clients) {
       if (filter(ws, client)) this.send(ws, type, data);
     }
@@ -137,10 +133,7 @@ export class Server {
     [type: string]: ((websocket: WebSocket, data: Message | any) => void)[];
   } = {};
 
-  on(
-    type: string | "*",
-    callback: (websocket: WebSocket, message: Message | any) => void
-  ) {
+  on(type: string | "*", callback: (websocket: WebSocket, message: Message | any) => void) {
     if (!this.#eventListeners[type]) this.#eventListeners[type] = [];
     this.#eventListeners[type].push(callback);
   }
