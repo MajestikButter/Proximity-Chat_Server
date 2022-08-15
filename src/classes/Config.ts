@@ -57,9 +57,9 @@ const DEF_CONFIG_STR = `{
   
    /**
     * Enables HTTPS server mode. Certificates are required and placed in the certs folder as certs/key.pem and certs/cert.pem.
-    * Default: false
+    * Default: true
     */
-    "https_enabled": false
+    "https_enabled": true
 }`;
 
 function parseConfig(str: string): ConfigData {
