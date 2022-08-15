@@ -4,6 +4,7 @@ import { Logger } from "./Logger";
 import { Client } from "./Client";
 import { Server as HSServer } from "https";
 import { Server as HServer } from "http";
+import { createConnection, Server as TServer } from "net";
 import * as fs from "fs";
 import path from "path";
 
@@ -15,8 +16,11 @@ export class Server {
   config = new Config();
   logger = new Logger(this.config.get("show_logs"));
   clients = new Map<WebSocket, Client>();
-  http: HServer | HSServer;
-  server: WebSocketServer;
+  http: HServer;
+  https?: HSServer;
+  ws: WebSocketServer;
+  wss?: WebSocketServer;
+  tcp: TServer;
   info: ServerInfo;
 
   certs() {
@@ -37,27 +41,49 @@ export class Server {
       name: this.config.get("server_name"),
       password: this.config.get("server_password"),
     };
-
     const address = this.config.get("server_address");
-    const host = address?.length ? address : "localhost";
-    const port = process.env.PORT ? parseInt(process.env.PORT) : this.config.get("server_port");
-    if (this.config.get("https_enabled")) {
-      this.http = new HSServer(this.certs()).listen(port, host);
-    } else {
-      this.http = new HServer().listen(port, host);
-    }
-    this.logger.log(`HTTP${this.config.get("https_enabled") ? "S" : ""} Server started on ${host}:${port}`);
+    const host = address.length ? address : "localhost";
+    const base_port = this.config.get("server_port");
+    const https_port = this.config.get("https_server_port");
+    const http_port = this.config.get("http_server_port");
 
-    this.server = this.createWebSocketServer();
+    this.tcp = new TServer((conn) => {
+      conn.once("data", (buf) => {
+        // A TLS handshake record starts with byte 22.
+        const isHttp = buf[0] === 22 && this.config.get("https_enabled");
+        const proxy = createConnection(isHttp ? https_port : http_port, host, function () {
+          proxy.write(buf);
+          conn.pipe(proxy).pipe(conn);
+        });
+      });
+    }).listen(base_port, host);
+    this.logger.log(`Server started on ${host}:${base_port}`);
+
+    if (this.config.get("https_enabled")) {
+      this.https = new HSServer(this.certs(), (req, res) => {
+        console.log("incoming https");
+        res.writeHead(200);
+        res.end('{"content":"aaaaaaaa"}');
+      }).listen(https_port, host);
+      this.logger.log(`HTTPS Server started on ${host}:${https_port}`);
+    }
+
+    this.http = new HServer((req, res) => {
+      console.log("incoming http");
+      res.writeHead(200);
+      res.end('{"content":"aaaaaaaa"}');
+    }).listen(http_port, host);
+    this.logger.log(`HTTP Server started on ${host}:${http_port}`);
+
+    const { ws, wss } = this.createWebSocketServers();
+    this.ws = ws;
+    this.wss = wss;
 
     this.logger.log("Server created");
   }
 
-  createWebSocketServer() {
-    const wss = new WebSocketServer({ server: this.http });
-    this.logger.log(`WebSocket started`);
-
-    wss.on("connection", (ws) => {
+  createWebSocketServers() {
+    const handleConnection = (ws: WebSocket.WebSocket) => {
       this.logger.log("New connection");
 
       this.logger.log("Connection established");
@@ -94,9 +120,19 @@ export class Server {
         clearTimeout(mcTimeout);
         this.removeClient(ws);
       });
-    });
+    };
 
-    return wss;
+    let wss: WebSocketServer | undefined;
+    if (this.https) {
+      wss = new WebSocketServer({ server: this.https });
+      wss.on("connection", handleConnection);
+      this.logger.log(`Secure WebSocket started`);
+    }
+
+    const ws = new WebSocketServer({ server: this.http });
+    ws.on("connection", handleConnection);
+    this.logger.log(`WebSocket started`);
+    return { ws, wss };
   }
 
   sendAll(type: string, data: any, filter: (ws: WebSocket, client: Client) => boolean = () => true) {

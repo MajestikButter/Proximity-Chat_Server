@@ -6,10 +6,12 @@ interface ConfigData {
   server_password: string;
   server_address: string;
   server_port: number;
+  http_server_port: number;
+  https_enabled: boolean;
+  https_server_port: number;
   show_logs: boolean;
   max_distance: number;
   spectator_to_player: boolean;
-  https_enabled: boolean;
 }
 
 const DEF_CONFIG_STR = `{
@@ -29,13 +31,31 @@ const DEF_CONFIG_STR = `{
    * The address the server will listen on.
    * Default: localhost
    */
-   "server_address": "",
+  "server_address": "localhost",
 
   /**
    * The port the server will listen on.
-   * Default: 8080
+   * Default: 8000
    */
-  "server_port": 8080,
+  "server_port": 8000,
+
+   /**
+    * The port the http server will listen on.
+    * Default: 8001
+    */
+  "http_server_port": 8001,
+  
+  /**
+   * Enables HTTPS server mode. Certificates are required and placed in the certs folder as certs/key.pem and certs/cert.pem.
+   * Default: false
+   */
+  "https_enabled": false,
+
+  /**
+   * The port the https server will listen on.
+   * Default: 8002
+   */
+  "https_server_port": 8002,
 
   /**
    * Whether the console should log debug messages.
@@ -53,13 +73,7 @@ const DEF_CONFIG_STR = `{
    * Enables non-spectator mode players hearing players in spectator mode.
    * Default: false
    */
-   "spectator_to_player": false,
-  
-   /**
-    * Enables HTTPS server mode. Certificates are required and placed in the certs folder as certs/key.pem and certs/cert.pem.
-    * Default: true
-    */
-    "https_enabled": true
+  "spectator_to_player": false
 }`;
 
 function parseConfig(str: string): ConfigData {
