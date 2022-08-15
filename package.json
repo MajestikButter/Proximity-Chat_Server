@@ -4,13 +4,14 @@
     "@types/ws": "^8.5.3"
   },
   "scripts": {
+    "watch": "node --enable-source-maps build.js",
     "run": "node --enable-source-maps dist/index.js",
     "start": "npm run run",
     "build": "node build-to-run.js"
   },
   "dependencies": {
-    "websocket-stream": "^5.5.2",
     "esbuild": "^0.14.48",
+    "websocket-stream": "^5.5.2",
     "ws": "^8.8.0"
   }
 }

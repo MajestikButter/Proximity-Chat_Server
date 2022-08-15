@@ -2,6 +2,10 @@ import WebSocket, { WebSocketServer } from "ws";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
 import { Client } from "./Client";
+import { Server as HSServer } from "https";
+import { Server as HServer } from "http";
+import * as fs from "fs";
+import path from "path";
 
 interface ServerInfo {
   name: string;
@@ -11,14 +15,38 @@ export class Server {
   config = new Config();
   logger = new Logger(this.config.get("show_logs"));
   clients = new Map<WebSocket, Client>();
+  http: HServer | HSServer;
   server: WebSocketServer;
   info: ServerInfo;
 
+  certs() {
+    const certsPath = path.join(__dirname, "certs");
+    const key = path.join(certsPath, "key.pem");
+    const cert = path.join(certsPath, "cert.pem");
+    if (!fs.existsSync(certsPath) || !fs.existsSync(key) || !fs.existsSync(cert)) {
+      throw new Error("HTTPS is enabled but certs were not provided");
+    }
+
+    return {
+      key: fs.readFileSync(key),
+      cert: fs.readFileSync(cert),
+    };
+  }
   constructor() {
     this.info = {
       name: this.config.get("server_name"),
       password: this.config.get("server_password"),
     };
+
+    const address = this.config.get("server_address");
+    const host = address?.length ? address : "localhost";
+    const port = process.env.PORT ? parseInt(process.env.PORT) : this.config.get("server_port");
+    if (this.config.get("https_enabled")) {
+      this.http = new HSServer(this.certs()).listen(port, host);
+    } else {
+      this.http = new HServer().listen(port, host);
+    }
+    this.logger.log(`HTTP${this.config.get("https_enabled") ? "S" : ""} Server started on ${host}:${port}`);
 
     this.server = this.createWebSocketServer();
 
@@ -26,13 +54,8 @@ export class Server {
   }
 
   createWebSocketServer() {
-    const host = this.config.get("server_address");
-    const port = process.env.PORT ? parseInt(process.env.PORT) : this.config.get("server_port");
-    const wss = new WebSocketServer({
-      host,
-      port,
-    });
-    this.logger.log(`WebSocket started on ${host}:${port}`);
+    const wss = new WebSocketServer({ server: this.http });
+    this.logger.log(`WebSocket started`);
 
     wss.on("connection", (ws) => {
       this.logger.log("New connection");
@@ -40,7 +63,7 @@ export class Server {
       this.logger.log("Connection established");
       const mcTimeout = setTimeout(() => {
         if (!this.getClient(ws)) {
-          const client = this.addClient(ws, true);
+          this.addClient(ws, true);
         }
       }, 5000);
 
