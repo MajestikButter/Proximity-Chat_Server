@@ -12,6 +12,7 @@ interface ConfigData {
   show_logs: boolean;
   max_distance: number;
   spectator_to_player: boolean;
+  ice_servers: RTCIceServer[];
 }
 
 const DEF_CONFIG_STR = `{
@@ -39,12 +40,12 @@ const DEF_CONFIG_STR = `{
    */
   "server_port": 8000,
 
-   /**
-    * The port the http server will listen on.
-    * Default: 8001
-    */
+  /**
+   * The port the http server will listen on.
+   * Default: 8001
+   */
   "http_server_port": 8001,
-  
+
   /**
    * Enables HTTPS server mode. Certificates are required and placed in the certs folder as certs/key.pem and certs/cert.pem.
    * Default: false
@@ -68,12 +69,40 @@ const DEF_CONFIG_STR = `{
    * Default: 25
    */
   "max_distance": 25,
-  
+
   /**
    * Enables non-spectator mode players hearing players in spectator mode.
    * Default: false
    */
-  "spectator_to_player": false
+  "spectator_to_player": false,
+
+  /**
+   * Specifies the turn and stun servers to use for webrtc communication.
+   */
+  "ice_servers": [
+    {
+      "urls": "turn:openrelay.metered.ca:80",
+      "username": "openrelayproject",
+      "credential": "openrelayproject"
+    },
+    {
+      "urls": "turn:openrelay.metered.ca:443",
+      "username": "openrelayproject",
+      "credential": "openrelayproject"
+    },
+    {
+      "urls": "stun:stun1.l.google.com:19302"
+    },
+    {
+      "urls": "stun:stun2.l.google.com:19302"
+    },
+    {
+      "urls": "stun:stun3.l.google.com:19302"
+    },
+    {
+      "urls": "stun:stun4.l.google.com:19302"
+    }
+  ]
 }`;
 
 function parseConfig(str: string): ConfigData {

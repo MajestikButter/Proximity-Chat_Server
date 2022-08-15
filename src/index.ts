@@ -32,6 +32,7 @@ server.on("loginRequest", (ws, message) => {
       config: {
         maxDistance: server.config.get("max_distance"),
         spectatorToPlayer: server.config.get("spectator_to_player"),
+        iceServers: server.config.get("ice_servers"),
       },
       client: ClientInfo(client),
     });

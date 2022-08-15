@@ -1,10 +1,12 @@
-import WebSocket, { WebSocketServer } from "ws";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
 import { Client } from "./Client";
+
+import WebSocket, { WebSocketServer } from "ws";
 import { Server as HSServer } from "https";
 import { Server as HServer } from "http";
 import { createConnection, Server as TServer } from "net";
+
 import * as fs from "fs";
 import path from "path";
 
